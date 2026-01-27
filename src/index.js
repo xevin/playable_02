@@ -1,23 +1,27 @@
-import { Application } from "pixi.js";
-
+import { Application, Assets } from "pixi.js";
+import * as AssetLib from "./assets.js"
+import Game from "./game";
 
 const initApp = async () => {
   const app = new Application();
   const gameWrapper = document.getElementById("app")
-
-
   await app.init({
-    background: "#1099bb",
+    background: "#233040",
     resizeTo: window,
-    height: 960
+    height: 1080
   });
-
-
   gameWrapper.appendChild(app.canvas)
 
+  // --- Ассеты
+  const assets = await Assets.loadBundle("main");
 
+  // --- добавляем всякое для отрисовки
+  const game = new Game({app, assets})
+  app.stage.addChild(game)
+
+  // ---
   function resize() {
-    let scale = app.screen.height / 960
+    let scale = app.screen.height / 1080
     app.stage.scale.set(scale)
     app.stage.position.y = 0
   }
