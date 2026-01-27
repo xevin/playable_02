@@ -1,0 +1,21 @@
+{
+  "name": "playable-pixi",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "playable-scripts dev",
+    "dev-open": "playable-scripts dev --open",
+    "build": "playable-scripts build"
+  },
+  "author": "xevin",
+  "license": "ISC",
+  "description": "Базовый шаблон для написания playable на pixi.js",
+  "devDependencies": {
+    "@smoud/playable-scripts": "^1.1.2",
+    "vite": "^7.3.1",
+    "vite-plugin-singlefile": "^2.3.0"
+  },
+  "dependencies": {
+    "pixi.js": "^8.15.0"
+  }
+}
