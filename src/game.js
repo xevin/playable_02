@@ -1,8 +1,9 @@
-import { Container, Sprite, Texture } from "pixi.js";
+import { Container, Sprite, Text, BlurFilter, ColorMatrixFilter, Graphics } from "pixi.js";
 import Loadbar from "./loadbar";
 import Config from "./config"
+import SlotsScene from "./slots_scene";
+import Gui from "./gui";
 import { gsap } from "gsap/gsap-core"
-
 
 export default class Game extends Container {
   app
@@ -14,9 +15,25 @@ export default class Game extends Container {
     this.app = props.app
     this.assets = props.assets
 
-    this.loadingScene = this.createLoadingScene()
-    this.addChild(this.loadingScene)
+    this.slotsScene = new SlotsScene({app: this.app, assets: this.assets})
+    this.addChild(this.slotsScene)
 
+    let balance = 0
+    this.gui = new Gui({...props})
+    this.gui.on("spinpressed", () => {
+      balance += 100
+      if (balance <= 300) {
+        this.gui.animateBalanceTo(balance)
+        return
+      }
+
+      this.slotsScene.fadeUnload()
+    })
+
+    this.loadingScene = this.createLoadingScene()
+
+    this.addChild(this.gui)
+    this.addChild(this.loadingScene)
     this.startLoading()
   }
 
@@ -28,14 +45,6 @@ export default class Game extends Container {
     bg.position.x = Config.width / 2
     bg.position.y = Config.height / 2
     container.addChild(bg)
-
-    // LOGO
-    let logo = new Sprite(this.assets.logo)
-    logo.anchor.set(0.5)
-    logo.scale.set(0.9)
-    logo.position.x = Config.width / 2
-    logo.position.y = 150
-    container.addChild(logo)
 
     // LOADER
     this.loader = new Loadbar({

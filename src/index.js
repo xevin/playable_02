@@ -1,16 +1,20 @@
 import { Application, Assets } from "pixi.js";
-import * as AssetLib from "./assets.js"
+import AssetLib from "./assets.js"
 import Game from "./game";
+import Config from "./config"
+import { initDevtools } from "@pixi/devtools";
 
 const initApp = async () => {
   const app = new Application();
   const gameWrapper = document.getElementById("app")
   await app.init({
-    background: "#233040",
     resizeTo: window,
-    height: 1080
+    background: Config.bgColor,
+    height: Config.height
   });
   gameWrapper.appendChild(app.canvas)
+
+  initDevtools({app})
 
   // --- Ассеты
   const assets = await Assets.loadBundle("main");
@@ -21,12 +25,18 @@ const initApp = async () => {
 
   // ---
   function resize() {
-    let scale = app.screen.height / 1080
-    app.stage.scale.set(scale)
-    app.stage.position.y = 0
+    const originalHeight = Config.height
+
+    let width = gameWrapper.offsetWidth;
+    let height = gameWrapper.offsetHeight;
+
+    let screenScale = height / originalHeight
+    app.stage.scale.set(screenScale)
+    app.renderer.resize(width, height);
+    app.stage.position.x = (gameWrapper.offsetWidth - Config.width * screenScale) / 2
   }
 
-  // Масштабирование канваса под размер экрана
+  // Масштабирование холста под размер экрана
   window.addEventListener("resize", resize);
   resize()
 };

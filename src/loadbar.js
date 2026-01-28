@@ -48,13 +48,14 @@ export default class Loadbar extends Container {
 
     if (value >= 100) {
       this.value = 100
-      // this.emit("full")
     }
 
     await gsap.to(this.loaderProgress, {
       x: (this.percentStep * this.value) - (this.progress.width / 2),
       duration: 0.6,
       ease: "power1.inOut"
-    }).delay(0.3)
+    }).delay(0.3).eventCallback("onComplete", () => {
+      this.emit("full")
+    })
   }
 }
