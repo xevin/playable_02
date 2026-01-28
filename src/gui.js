@@ -6,6 +6,7 @@ import Config from "./config"
 export default class Gui extends Container {
   balanceValue = 0.0
   balanceText
+  isSpinButtonLocked = false
 
   constructor(props) {
     super()
@@ -68,15 +69,32 @@ export default class Gui extends Container {
 
   }
 
-  animateBalanceTo(value) {
-    gsap.to(this, {
-      balanceValue: value
+  show() {
+    // появление спиннера
+    console.log("spinner show()")
+  }
+
+  setBalance(value) {
+    this.balanceValue = value
+    this.balanceText.text = "$ " + parseFloat(this.balanceValue).toFixed(2)
+  }
+
+  async animateBalanceTo(value, duration=1.0) {
+    await gsap.to(this, {
+      balanceValue: value,
+      duration,
     }).eventCallback("onUpdate", () => {
       this.balanceText.text = "$ " + parseFloat(this.balanceValue).toFixed(2)
+      this.emit("balanceUpdated")
     })
   }
 
   async onSpinButtonPressed() {
+    if (this.isSpinButtonLocked) {
+      console.log("gui spin button is locked")
+      return
+    }
+
     await gsap.to(this.spinButtonWrap.scale, {
       x: 0.9,
       y: 0.9,

@@ -1,7 +1,8 @@
-import { Container, Sprite, Text, BlurFilter, ColorMatrixFilter, Graphics } from "pixi.js";
-import Loadbar from "./loadbar";
+import { Container, Sprite } from "pixi.js"
+import Loadbar from "./loadbar"
 import Config from "./config"
-import SlotsScene from "./slots_scene";
+import Spinner from "./spinner"
+import SlotsScene from "./slots_scene"
 import Gui from "./gui";
 import { gsap } from "gsap/gsap-core"
 
@@ -18,22 +19,83 @@ export default class Game extends Container {
     this.slotsScene = new SlotsScene({app: this.app, assets: this.assets})
     this.addChild(this.slotsScene)
 
-    let balance = 0
+    let balance = 10
+    let gotoSpinner = false
     this.gui = new Gui({...props})
+    this.gui.setBalance(balance)
+
+    this.slotsScene.on("slotsStopped", async () => {
+      await this.gui.animateBalanceTo(balance)
+
+      this.gui.isSpinButtonLocked = false
+
+      // переключение сцены на спиннер
+      if (gotoSpinner) {
+        this.slotsScene.fadeUnload()
+        this.spinnerScene.show()
+      }
+    })
+
+    // Обработка кликов
+    let clickCount = 0
+
     this.gui.on("spinpressed", () => {
-      balance += 100
-      if (balance <= 300) {
-        this.gui.animateBalanceTo(balance)
+      if (this.gui.isSpinButtonLocked) {
+        console.log("button is locked")
         return
       }
+      clickCount += 1
+      console.log("click", clickCount)
+      this.gui.isSpinButtonLocked = true
 
-      this.slotsScene.fadeUnload()
+      if (!gotoSpinner) {
+        this.slotsScene.runSlots()
+      }
+
+      switch (clickCount) {
+        case 1:
+          balance = 200
+          break;
+        case 2:
+          balance += 7
+          break;
+        case 3:
+          balance = 700
+          break;
+        case 4:
+          balance += 7
+          break;
+        case 5:
+          gotoSpinner = true
+          this.gui.isSpinButtonLocked = true
+          break;
+        case 6:
+          this.spinnerScene.spinWheel()
+          this.gui.isSpinButtonLocked = true
+          break;
+      }
+
+      console.log("clicks now", clickCount)
     })
 
     this.loadingScene = this.createLoadingScene()
 
+    this.spinnerScene = new Spinner({...props})
+    this.spinnerScene.on("spinnerDone", () => {
+      balance = balance * 66
+      this.gui.animateBalanceTo(balance, 2)
+    })
+    this.spinnerScene.on("afterShow", () => {
+      this.gui.isSpinButtonLocked = false
+    })
+
+    this.addChild(this.spinnerScene)
+    this.spinnerScene.visible = false
     this.addChild(this.gui)
+
     this.addChild(this.loadingScene)
+//    this.loadingScene.visible = true
+    this.loadingScene.visible = false
     this.startLoading()
   }
 

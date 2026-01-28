@@ -2,13 +2,6 @@ import { Container, Graphics, Sprite, BlurFilter, Text } from "pixi.js";
 import { gsap } from "gsap/gsap-core"
 import Config from "./config"
 
-let fontStyle = {
-  fill: "#3d3d3d",
-  fontSize: 60,
-  fontFamily: "Shripht",
-  align: "center"
-}
-
 export default class SlotsScene extends Container {
   constructor(props) {
     super()
@@ -41,12 +34,35 @@ export default class SlotsScene extends Container {
 
     let jeff = new Sprite(this.assets.jeff)
     jeff.anchor.set(1, 1)
-    jeff.scale.set(0.38)
+    jeff.scale.set(0.78)
     jeff.position.x = Config.width + 40
     jeff.position.y = Config.height
     this.gameContainer.addChild(jeff)
 
+    let slotsContainer = new Container()
+
+    let slotsBackground = new Sprite(this.assets.slotsBackground)
+    slotsBackground.anchor.set(0.5)
+    slotsContainer.addChild(slotsBackground)
+
+    let slotsFrame = new Sprite(this.assets.slotsFrame)
+    slotsFrame.anchor.set(0.5)
+    slotsContainer.addChild(slotsFrame)
+
+    slotsContainer.position.x = Config.width / 2
+    slotsContainer.position.y = Config.height / 2
+    slotsContainer.scale.set(0.85)
+    this.gameContainer.addChild(slotsContainer)
+
     return container
+  }
+
+  runSlots() {
+    console.log("runSlots()")
+    setTimeout(() => {
+      console.log("slotsStopped()")
+      this.emit("slotsStopped")
+    }, 1000)
   }
 
   async fadeUnload() {

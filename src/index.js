@@ -9,7 +9,7 @@ const initApp = async () => {
   const gameWrapper = document.getElementById("app")
   await app.init({
     resizeTo: window,
-    background: Config.bgColor,
+    background: Config.loadingBgColor,
     height: Config.height
   });
   gameWrapper.appendChild(app.canvas)
@@ -22,6 +22,7 @@ const initApp = async () => {
   // --- добавляем всякое для отрисовки
   const game = new Game({app, assets})
   app.stage.addChild(game)
+  app.renderer.background.color = Config.bgColor
 
   // ---
   function resize() {
