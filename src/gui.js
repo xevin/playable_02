@@ -74,6 +74,10 @@ export default class Gui extends Container {
     console.log("spinner show()")
   }
 
+  hide() {
+    this.visible = false
+  }
+
   setBalance(value) {
     this.balanceValue = value
     this.balanceText.text = "$ " + parseFloat(this.balanceValue).toFixed(2)

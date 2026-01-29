@@ -1,0 +1,171 @@
+import { Container, Sprite, Text } from "pixi.js"
+import Config from "./config"
+import { gsap } from "gsap/gsap-core"
+
+export default class WinScene extends Container {
+  balanceValue = 700
+
+  constructor(props) {
+    super()
+    this.app = props.app
+    this.assets = props.assets
+
+    this.container = new Container()
+    this.container.position.x = Config.width / 2
+    this.container.position.y = Config.height / 2
+    this.addChild(this.container)
+
+    this.bigWin = new Sprite(this.assets.bigWin)
+    this.bigWin.anchor.set(0.5)
+    this.bigWin.position.y = -150
+    this.container.addChild(this.bigWin)
+
+    this.coinContainer = new Container()
+    this.coinContainer.position.y = 165
+
+    this.coinBalance = new Sprite(this.assets.balance)
+    this.coinBalance.anchor.set(0.5)
+    this.coinBalance.scale.set(0.67)
+    this.coinContainer.addChild(this.coinBalance)
+
+    this.coinText = new Text({
+      text: "$ " + this.balanceValue,
+      style: {
+        ...Config.fontStyles,
+        fontSize: 60,
+        align: "center"
+      },
+    })
+    this.coinText.anchor.set(0.5)
+    this.coinContainer.addChild(this.coinText)
+
+    this.container.addChild(this.coinContainer)
+
+    this.installButton = new Sprite(this.assets.installButton)
+    this.installButton.label = "InstallButton"
+    this.installButton.anchor.set(0.5)
+    this.installButton.scale.set(0)
+    this.installButton.position.y = 360
+    this.installButton.eventMode = "dynamic"
+    this.installButton.on("pointerdown", () => {
+      console.log("Playable переход куда надо")
+    })
+    this.container.addChild(this.installButton)
+  }
+
+  show() {
+    this.visible = true
+
+    let tl = gsap.timeline()
+
+    let toScale = 0.92
+    tl.to(this.bigWin.scale, {
+      x: toScale,
+      y: toScale,
+      ease: "elastic.out(1,0.75)",
+      duration: 1,
+    }, 0)
+
+    tl.to(this.installButton.scale, {
+      x: 1,
+      y: 1,
+      ease: "elastic.out(1,0.75)",
+      duration: 0.8,
+    }, 0.8)
+
+    tl.to(this.bigWin, {
+      x: this.bigWin.position.x + 20,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut",
+      duration: 2,
+    }, 0.7)
+    tl.fromTo(this.bigWin, {
+      y: this.bigWin.position.y - 10,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut",
+      duration: 1,
+    },{
+      y: this.bigWin.position.y + 10,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut",
+      duration: 1,
+    }, 0.7)
+
+    tl.fromTo(this.bigWin, {
+      angle: 2,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut",
+      duration: 1,
+    },
+    {
+      angle: -2,
+      repeat: -1,
+      yoyo: true,
+      ease: "power1.inOut",
+      duration: 0.9
+    }, 0.7)
+
+
+    // -- INSTALLATION BUTTON
+    let installButtonStart = 1
+    tl.fromTo(this.installButton.scale, {
+      y: 0.9,
+      yoyo: true,
+      repeat: -1,
+      duration: 0.2,
+      ease: "power1.inOut",
+    }, {
+      y: 1,
+      yoyo: true,
+      repeat: -1,
+      duration: 0.2,
+      ease: "power1.inOut",
+    }, installButtonStart)
+
+    tl.fromTo(this.installButton, {
+      y: this.installButton.position.y - 10,
+      yoyo: true,
+      repeat: -1,
+      duration: 0.35,
+      ease: "power1.inOut",
+    }, {
+      y: this.installButton.position.y + 10,
+      yoyo: true,
+      repeat: -1,
+      duration: 0.35,
+      ease: "power1.inOut",
+    }, installButtonStart)
+
+    tl.fromTo(this.installButton, {
+      x: this.installButton.position.x - 5,
+      yoyo: true,
+      repeat: -1,
+      duration: 0.5,
+      ease: "power1.inOut",
+    }, {
+      x: this.installButton.position.x + 5,
+      yoyo: true,
+      repeat: -1,
+      duration: 0.4,
+      ease: "power1.inOut",
+    }, installButtonStart)
+
+    tl.fromTo(this.installButton, {
+      angle: -1,
+      yoyo: true,
+      repeat: -1,
+      duration: 0.3,
+      ease: "power1.inOut",
+    }, {
+      angle: 2,
+      yoyo: true,
+      repeat: -1,
+      duration: 0.3,
+      ease: "power1.inOut",
+    }, installButtonStart)
+  }
+}

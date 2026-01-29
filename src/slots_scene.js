@@ -16,6 +16,7 @@ export default class SlotsScene extends Container {
   createGameScene() {
     // Общий контейнер
     let container = new Container()
+
     // контейнер со слотами, лого и фоном
     this.gameContainer = new Container()
     let gameBgContainer = new Container()
