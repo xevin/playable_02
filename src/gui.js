@@ -1,7 +1,8 @@
 import { Container, Graphics, Sprite, BlurFilter, Text } from "pixi.js"
 import { gsap } from "gsap/gsap-core"
 import Config from "./config"
-
+import { Howl } from "howler"
+import { sounds } from "./assets"
 
 export default class Gui extends Container {
   balanceValue = 0.0
@@ -67,11 +68,50 @@ export default class Gui extends Container {
     spinText.eventMode = "none"
     this.spinButtonWrap.addChild(spinText)
 
+    this.pointer = new Sprite(this.assets.pointer)
+//    this.pointer.scale.set(0.1)
+    this.pointer.position.x = 950
+    this.pointer.position.y = 980
+    this.pointer.angle = -25
+    this.addChild(this.pointer)
+
+    this.clickSound = new Howl({
+      src: [
+        sounds.click
+      ],
+      html5: true,
+    })
+    this.coinsAddSound = new Howl({
+      src: [
+        sounds.coinsAdd
+      ],
+      html5: true,
+    })
+
+    // Анимация пальца
+    gsap.to(this.pointer, {
+      x: this.pointer.x + 20,
+      y: this.pointer.y + 80,
+      yoyo: true,
+      repeat: -1,
+      duration: 0.25,
+      ease: "power1.inOut(0.4)"
+    })
   }
 
   show() {
     // появление спиннера
     console.log("spinner show()")
+  }
+
+  setSpinButtonLocked(value) {
+    this.isSpinButtonLocked = value
+
+    // DEBUG
+//    this.spinButtonWrap.alpha = value ? 0.5 : 1
+//    console.log("set locked?", value)
+
+    this.pointer.visible = !value
   }
 
   hide() {
@@ -84,6 +124,10 @@ export default class Gui extends Container {
   }
 
   async animateBalanceTo(value, duration=1.0) {
+    if (this.balanceValue != value) {
+      this.coinsAddSound.play()
+    }
+
     await gsap.to(this, {
       balanceValue: value,
       duration,
@@ -91,6 +135,7 @@ export default class Gui extends Container {
       this.balanceText.text = "$ " + parseFloat(this.balanceValue).toFixed(2)
       this.emit("balanceUpdated")
     })
+    this.coinsAddSound.stop()
   }
 
   async onSpinButtonPressed() {
@@ -98,6 +143,8 @@ export default class Gui extends Container {
       console.log("gui spin button is locked")
       return
     }
+
+    this.clickSound.play()
 
     await gsap.to(this.spinButtonWrap.scale, {
       x: 0.9,

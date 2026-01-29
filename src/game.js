@@ -22,9 +22,10 @@ export default class Game extends Container {
 
     this.app = props.app
     this.assets = props.assets
-//    this.state = LOADING_STATE
+    this.state = LOADING_STATE
 //    this.state = SLOTS_STATE
-    this.state = SPINNER_STATE
+//    this.state = SLOTS_STATE
+//    this.state = WIN_STATE
 
     this.slotsScene = new SlotsScene({app: this.app, assets: this.assets})
     this.addChild(this.slotsScene)
@@ -42,7 +43,7 @@ export default class Game extends Container {
         this.slotsScene.fadeUnload()
         this.spinnerScene.show()
       } else {
-        this.gui.isSpinButtonLocked = false
+        this.gui.setSpinButtonLocked(false)
       }
     })
 
@@ -57,11 +58,12 @@ export default class Game extends Container {
 
       clickCount += 1
       console.log("click", clickCount)
-      this.gui.isSpinButtonLocked = true
+      this.gui.setSpinButtonLocked(true)
 
       if (!gotoSpinner) {
         this.slotsScene.runSlots()
       }
+
       if (this.state === SLOTS_STATE) {
         console.log("крутим слоты")
       } else if (this.state === SPINNER_STATE) {
@@ -69,28 +71,28 @@ export default class Game extends Container {
         this.spinnerScene.spinWheel()
       }
 
-//      switch (clickCount) {
-//        case 1:
-//          balance = 200
-//          break;
-//        case 2:
-//          balance += 7
-//          break;
-//        case 3:
-//          balance = 700
-//          break;
-//        case 4:
-//          balance += 7
-//          break;
-//        case 5:
-//          gotoSpinner = true
-//          this.gui.isSpinButtonLocked = true
-//          break;
-//        case 6:
-//          this.spinnerScene.spinWheel()
-//          this.gui.isSpinButtonLocked = true
-//          break;
-//      }
+      switch (clickCount) {
+        case 1:
+          balance = 200
+          break;
+        case 2:
+          balance += 7
+          break;
+        case 3:
+          balance = 700
+          break;
+        case 4:
+          balance += 0
+          break;
+        case 5:
+          gotoSpinner = true
+          this.gui.setSpinButtonLocked(true)
+          break;
+        case 6:
+          this.spinnerScene.spinWheel()
+          this.gui.setSpinButtonLocked(true)
+          break;
+      }
 
       console.log("clicks now", clickCount)
     })
@@ -105,7 +107,7 @@ export default class Game extends Container {
       this.gui.hide()
     })
     this.spinnerScene.on("afterShow", () => {
-      this.gui.isSpinButtonLocked = false
+      this.gui.setSpinButtonLocked(false)
     })
 
     this.addChild(this.spinnerScene)
@@ -118,10 +120,11 @@ export default class Game extends Container {
     this.addChild(this.winScene)
 
     this.loadingScene.visible = this.state === LOADING_STATE
-    this.slotsScene.visible = this.state === SLOTS_STATE
+    this.slotsScene.visible = this.state === SLOTS_STATE || this.state === LOADING_STATE
     this.spinnerScene.visible = this.state === SPINNER_STATE
     this.winScene.visible = this.state === WIN_STATE
 
+    // kostyl for debug
     if (this.state === SPINNER_STATE) {
       console.log("показываем спиннер")
       this.spinnerScene.show()

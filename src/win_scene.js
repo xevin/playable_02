@@ -1,6 +1,7 @@
-import { Container, Sprite, Text } from "pixi.js"
+import { AlphaFilter, BlurFilter, Container, FillGradient, Graphics, Sprite, Text } from "pixi.js"
 import Config from "./config"
 import { gsap } from "gsap/gsap-core"
+import { sounds } from "./assets"
 
 export default class WinScene extends Container {
   balanceValue = 700
@@ -10,18 +11,48 @@ export default class WinScene extends Container {
     this.app = props.app
     this.assets = props.assets
 
+    this.clickSound = new Howl({
+      src: [
+        sounds.click
+      ],
+      html5: true,
+    })
+    this.winSound = new Howl({
+      src: [
+        sounds.win
+      ],
+      html5: true,
+    })
+
+    this.bg = new Graphics()
+    this.bg.rect(0, 0, Config.width, Config.height)
+    this.bg.fill(0x000000)
+    this.bg.alpha = 0
+    this.addChild(this.bg)
+
     this.container = new Container()
     this.container.position.x = Config.width / 2
     this.container.position.y = Config.height / 2
     this.addChild(this.container)
 
+    // лучи
+    this.lights = new Sprite(this.assets.lights)
+    this.lights.anchor.set(0.5)
+    this.lights.scale.set(0.5)
+    this.lights.alpha = 0.7
+    this.lights.position.y = -100
+    this.lights.filters = [new BlurFilter({strength: 30, quality: 7})]
+    this.container.addChild(this.lights)
+
     this.bigWin = new Sprite(this.assets.bigWin)
     this.bigWin.anchor.set(0.5)
+    this.bigWin.scale.set(0)
     this.bigWin.position.y = -150
     this.container.addChild(this.bigWin)
 
     this.coinContainer = new Container()
     this.coinContainer.position.y = 165
+    this.coinContainer.scale.set(0)
 
     this.coinBalance = new Sprite(this.assets.balance)
     this.coinBalance.anchor.set(0.5)
@@ -49,14 +80,42 @@ export default class WinScene extends Container {
     this.installButton.eventMode = "dynamic"
     this.installButton.on("pointerdown", () => {
       console.log("Playable переход куда надо")
+      this.clickSound.play()
     })
     this.container.addChild(this.installButton)
   }
 
   show() {
+    this.winSound.play()
     this.visible = true
 
     let tl = gsap.timeline()
+
+    tl.to(this.bg, {
+      alpha: 0.4
+    }, 0)
+
+    this.coinContainer.scale.set(0)
+    tl.to(this.coinContainer.scale,
+      {
+        x: 1,
+        y: 1,
+        ease: "power1.inOut",
+        duration: 0.7
+      },
+      0
+    )
+
+    tl.to(this, {
+      balanceValue: 46200,
+      ease: "power1.inOut",
+      duration: 1.5,
+      stagger: {
+        onUpdate: () => {
+          this.coinText.text = "$ " + parseFloat(this.balanceValue).toFixed(2)
+        }
+      }
+    }, 0)
 
     let toScale = 0.92
     tl.to(this.bigWin.scale, {
@@ -108,7 +167,6 @@ export default class WinScene extends Container {
       ease: "power1.inOut",
       duration: 0.9
     }, 0.7)
-
 
     // -- INSTALLATION BUTTON
     let installButtonStart = 1

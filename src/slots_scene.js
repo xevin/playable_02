@@ -1,6 +1,7 @@
 import { Container, Graphics, Sprite, BlurFilter, Text } from "pixi.js";
 import { gsap } from "gsap/gsap-core"
 import Config from "./config"
+import { sounds } from "./assets"
 
 export default class SlotsScene extends Container {
   constructor(props) {
@@ -11,6 +12,13 @@ export default class SlotsScene extends Container {
 
     this.z = 0
     this.addChild(this.createGameScene())
+
+    this.slotsRollSound = new Howl({
+      src: [
+        sounds.slotsRoll
+      ],
+      html5: true,
+    })
   }
 
   createGameScene() {
@@ -60,10 +68,12 @@ export default class SlotsScene extends Container {
 
   runSlots() {
     console.log("runSlots()")
+    this.slotsRollSound.play()
     setTimeout(() => {
       console.log("slotsStopped()")
       this.emit("slotsStopped")
-    }, 1000)
+      this.slotsRollSound.stop()
+    }, 1500)
   }
 
   async fadeUnload() {
@@ -76,7 +86,7 @@ export default class SlotsScene extends Container {
     // Затемняем и блюрим фон
     let tl = gsap.timeline()
     tl.to(this.blurFilter, {
-      blur: 20
+      strength: 20
     }, 0)
     tl.to(this.bgColor, {
       alpha: 0.65,

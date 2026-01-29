@@ -7,6 +7,7 @@ import {
 } from "pixi.js"
 import Config from "./config"
 import { gsap } from "gsap/gsap-core"
+import { sounds } from "./assets"
 
 export default class Spinner extends Container {
   constructor(props) {
@@ -14,7 +15,24 @@ export default class Spinner extends Container {
     this.app = props.app
     this.assets = props.assets
 
-
+    this.spinnerRollSound = new Howl({
+      src: [
+        sounds.spinnerRoll
+      ],
+      html5: true,
+    })
+    this.bonusSound = new Howl({
+      src: [
+        sounds.bonus
+      ],
+      html5: true,
+    })
+    this.winSound = new Howl({
+      src: [
+        sounds.spinnerWin
+      ],
+      html5: true,
+    })
     // тут будет спиннер, и оно будет блюрится
     this.contentContainer = new Container()
     this.contentContainer.label = "contentContainer"
@@ -65,6 +83,7 @@ export default class Spinner extends Container {
 
   show() {
     console.log("spinner show")
+    this.bonusSound.play()
     this.contentContainer.scale.set(0)
     this.visible = true
     gsap.to(this.contentContainer, {
@@ -78,7 +97,7 @@ export default class Spinner extends Container {
 
   spinWheel() {
     const angleToX66 = 2970
-
+    this.spinnerRollSound.play()
     // howl play here "casino short roulette spin mp3"
 
     gsap.to(this.wheel, {
@@ -87,6 +106,8 @@ export default class Spinner extends Container {
       ease: "sine"
     }).eventCallback("onComplete", async () => {
       this.wheel.angle = 45+45
+      this.spinnerRollSound.stop()
+      this.winSound.play()
       await this.showPrize()
       this.emit("spinnerDone")
     })
@@ -118,7 +139,7 @@ export default class Spinner extends Container {
 
     // размываем фон
     tl.to(this.blurFilter, {
-      blur: 20
+      strength: 20
     }, 0)
 
     // улетаем вверх
