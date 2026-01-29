@@ -2,6 +2,7 @@ import { Container, Graphics, Sprite, BlurFilter, Text } from "pixi.js";
 import { gsap } from "gsap/gsap-core"
 import Config from "./config"
 import { sounds } from "./assets"
+import SlotRoller from "./slot_roller";
 
 export default class SlotsScene extends Container {
   constructor(props) {
@@ -19,6 +20,27 @@ export default class SlotsScene extends Container {
       ],
       html5: true,
     })
+
+    let slotLineContainer = new Container()
+    slotLineContainer.label = "SlotLineContainer"
+    slotLineContainer.position.x = 635
+    slotLineContainer.position.y = 0
+
+    let slotMask = new Graphics() //new Sprite(this.assets.slotsBackground)
+    slotMask.label = "SlotMask"
+    slotMask.rect(600, 230, 700, 620).fill("#ffffff")
+    slotLineContainer.mask = slotMask
+    this.gameContainer.addChild(slotMask)
+    this.gameContainer.addChild(slotLineContainer)
+
+    this.slotLines = []
+    for(let i=0; i<4; i++) {
+      let slotLine = new SlotRoller({...props, startIndex: 3 - i + 5})
+      slotLine.position.x = i * 175
+//      slotLine.position.y = -1172
+      this.slotLines.push(slotLine)
+      slotLineContainer.addChild(slotLine)
+    }
   }
 
   createGameScene() {
@@ -66,14 +88,47 @@ export default class SlotsScene extends Container {
     return container
   }
 
+  createSlotLine() {
+    let container = new Container()
+    container.label = "SlotLine"
+
+    for(let i=1; i<8; i++) {
+      let slotSprite = new Sprite(this.assets["slot" + i])
+      slotSprite.label = "slot" + i
+      slotSprite.position.y = i * 128
+      container.addChild(slotSprite)
+    }
+
+    for(let i=1; i<8; i++) {
+      let slotSprite = new Sprite(this.assets["slot" + i])
+      slotSprite.label = "slot" + i
+      slotSprite.position.y = i * 128 + 896
+      container.addChild(slotSprite)
+    }
+    return container
+  }
+
   runSlots() {
     console.log("runSlots()")
     this.slotsRollSound.play()
+
+    let idx = 0
+    let it = setInterval(() => {
+      if (idx >= 4) {
+        clearInterval(it)
+        return
+      }
+      console.log("idx", idx)
+      let slotLine = this.slotLines[idx]
+      slotLine.rollTo(slotLine.startIndex)
+      idx += 1
+    }, 250)
+
     setTimeout(() => {
       console.log("slotsStopped()")
       this.emit("slotsStopped")
       this.slotsRollSound.stop()
-    }, 1500)
+    }, 3300)
   }
 
   async fadeUnload() {

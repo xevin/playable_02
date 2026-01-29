@@ -9,7 +9,7 @@ import Config from "./config"
 import { gsap } from "gsap/gsap-core"
 import { sounds } from "./assets"
 
-export default class Spinner extends Container {
+export default class SpinnerScene extends Container {
   constructor(props) {
     super()
     this.app = props.app

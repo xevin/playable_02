@@ -104,6 +104,12 @@ export default class Gui extends Container {
     console.log("spinner show()")
   }
 
+  hide() {
+    gsap.to(this, {
+      alpha: 0
+    })
+  }
+
   setSpinButtonLocked(value) {
     this.isSpinButtonLocked = value
 
@@ -112,10 +118,6 @@ export default class Gui extends Container {
 //    console.log("set locked?", value)
 
     this.pointer.visible = !value
-  }
-
-  hide() {
-    this.visible = false
   }
 
   setBalance(value) {

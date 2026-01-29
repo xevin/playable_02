@@ -1,11 +1,11 @@
 import { Container, Sprite } from "pixi.js"
 import Loadbar from "./loadbar"
 import Config from "./config"
-import Spinner from "./spinner"
 import SlotsScene from "./slots_scene"
 import Gui from "./gui";
 import { gsap } from "gsap/gsap-core"
 import WinScene from "./win_scene"
+import SpinnerScene from "./spinner_scene"
 
 const LOADING_STATE = 1
 const SLOTS_STATE = 2
@@ -23,6 +23,8 @@ export default class Game extends Container {
     this.app = props.app
     this.assets = props.assets
     this.state = LOADING_STATE
+
+    // DEBUG
 //    this.state = SLOTS_STATE
 //    this.state = SLOTS_STATE
 //    this.state = WIN_STATE
@@ -99,12 +101,14 @@ export default class Game extends Container {
 
     this.loadingScene = this.createLoadingScene()
 
-    this.spinnerScene = new Spinner({...props})
+    this.spinnerScene = new SpinnerScene({...props})
     this.spinnerScene.on("spinnerDone", () => {
       balance = balance * 66
       this.gui.animateBalanceTo(balance, 2)
       this.winScene.show()
-      this.gui.hide()
+      setTimeout(() => {
+        this.gui.hide()
+      }, 200)
     })
     this.spinnerScene.on("afterShow", () => {
       this.gui.setSpinButtonLocked(false)
