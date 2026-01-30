@@ -1,5 +1,6 @@
 import { Container, Rectangle, Texture, AnimatedSprite } from "pixi.js"
 import { gsap } from "gsap/gsap-core"
+import ExplosionAnimation from "./explosion_animation"
 
 export default class DroneAnimation extends Container {
   constructor(props) {
@@ -25,6 +26,12 @@ export default class DroneAnimation extends Container {
 
   playAnimation() {
     this.box.play()
-    let tl = gsap.timeline()
+    setTimeout(() => {
+      let expl = new ExplosionAnimation({assets: this.assets})
+      expl.position.y = 50
+      expl.position.x = 64
+      this.addChild(expl)
+      expl.playAnimation()
+    }, 50)
   }
 }

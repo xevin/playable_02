@@ -22,10 +22,10 @@ export default class Game extends Container {
 
     this.app = props.app
     this.assets = props.assets
-//    this.state = LOADING_STATE
+    this.state = LOADING_STATE
 
     // DEBUG
-    this.state = SLOTS_STATE
+//    this.state = SLOTS_STATE
 //    this.state = SLOTS_STATE
 //    this.state = WIN_STATE
 

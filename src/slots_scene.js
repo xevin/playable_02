@@ -154,8 +154,6 @@ export default class SlotsScene extends Container {
     }, 0.4)
 
     setTimeout(() => {
-      console.log("Jeff end!")
-      this.slotsRollSound.stop()
       this.emit("slotsStopped")
     }, 700)
 
@@ -236,8 +234,8 @@ export default class SlotsScene extends Container {
     }
 
     await tl
-    this.emit("slotsStopped")
     this.slotsRollSound.stop()
+    this.emit("slotsStopped")
   }
 
   resetSlotLines(pos=-4120) {
@@ -297,14 +295,17 @@ export default class SlotsScene extends Container {
             newDrone.destroy()
           }
         }
-      }, i * 0.15)
+      }, i * 0.15).delay(0.5)
       i += 1
     })
 
     setTimeout(() => {
       this.casualWinSound.play()
+    }, 200)
+
+    setTimeout(() => {
       this.emit("slotsStopped")
-    }, 300)
+    }, 1000)
   }
 
   jeffColumns() {

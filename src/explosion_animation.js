@@ -1,36 +1,31 @@
 import { Container, AnimatedSprite, Texture, Rectangle } from "pixi.js"
-import ExplosionAnimation from "./explosion_animation"
 
-export default class BoxAnimation extends Container {
+export default class ExplosionAnimation extends Container {
   constructor(props) {
     super()
     this.app = props.app
     this.assets = props.assets
 
     let frames = []
-    let sizeX = 128
-    let sizeY = 128
-    for(let i=0; i<23; i++) {
+    let sizeX = 200
+    let sizeY = 200
+
+    for(let i=0; i<17; i++) {
       let frame = new Texture({
-        source: this.assets.boxOpenAnimation,
+        source: this.assets.explosionAnimation,
         frame: new Rectangle(i * sizeX, 0, sizeX, sizeY)
       })
       frames.push(frame)
     }
     this.box = new AnimatedSprite(frames)
+    this.box.anchor.set(0.5)
+    this.box.scale.set(2)
     this.box.loop = false
     this.box.animationSpeed = 0.5
     this.addChild(this.box)
   }
 
-  playBoxAnimation() {
+  playAnimation() {
     this.box.play()
-    setTimeout(() => {
-      let expl = new ExplosionAnimation({assets: this.assets})
-      expl.position.y = 20
-      expl.position.x = 64
-      this.addChild(expl)
-      expl.playAnimation()
-    }, 700)
   }
 }
