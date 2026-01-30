@@ -15,7 +15,8 @@ export default class SlotsScene extends Container {
     this.assets = props.assets
 
     this.z = 0
-    this.addChild(this.createGameScene())
+    this.gameScene = this.createGameScene()
+    this.addChild(this.gameScene)
 
     this.slotsRollSound = new Howl({
       src: [
@@ -62,11 +63,13 @@ export default class SlotsScene extends Container {
   createGameScene() {
     // Общий контейнер
     let container = new Container()
+    container.label = "createGameScene"
 
     // контейнер со слотами, лого и фоном
     this.gameContainer = new Container()
     this.gameContainer.label = "gameContainer"
     let gameBgContainer = new Container()
+    gameBgContainer.label = "bgColor"
     this.bgColor = new Graphics()
       .rect(0, 0, Config.width, Config.height)
       .fill("#000000")
@@ -176,7 +179,7 @@ export default class SlotsScene extends Container {
     }
     if (this.tryCount === 3) {
       this.slotsRollSound.play()
-      this.runSlots2()
+      this.runSlots2(-4120)
     }
     if (this.tryCount === 4) {
       this.slotsRollSound.play()
@@ -215,8 +218,8 @@ export default class SlotsScene extends Container {
     }, 1700)
   }
 
-  async runSlots2() {
-    this.resetSlotLines()
+  async runSlots2(posY) {
+    this.resetSlotLines(posY)
 
     let tl = gsap.timeline()
 
@@ -264,7 +267,7 @@ export default class SlotsScene extends Container {
       tl.to(drones[i], {
         y: 1250,
         duration: 0.9,
-      }, i * 0.25 + 1.2)
+      }, i * 0.25 + 1)
 
       tl.to(this.slotLines[i], {
         y: 250,
@@ -280,10 +283,13 @@ export default class SlotsScene extends Container {
     let i = 0
     drones.forEach(dr => {
       let newDrone = new DroneAnimation({assets: this.assets})
-      newDrone.position = dr.getGlobalPosition()
-      newDrone.zIndex = 1000
-      this.addChild(newDrone)
+      newDrone.position = dr.position
+      newDrone.position.x += this.slotLineContainer.position.x
+      newDrone.position.y += container.position.y + this.slotLineContainer.position.y
+
+      this.gameContainer.addChild(newDrone)
       newDrone.playAnimation()
+
       dr.destroy()
       tl2.to(newDrone, {
         y: 80,
@@ -320,8 +326,12 @@ export default class SlotsScene extends Container {
   }
 
   jeffRoll() {
+    this.jeffCols.alpha = 0
     gsap.to(this.jeffCols, {
-      y: -220
+      y: -220,
+      alpha: 1,
+      duration: 1.3,
+      ease: "elastic.inOut(0.9)"
     })
   }
 
@@ -348,12 +358,14 @@ export default class SlotsScene extends Container {
     let moneyList = []
     this.boxes.forEach(box => {
       let money = new Sprite(this.assets.dollars)
+      money.label = "Dollars"
       moneyList.push(money)
       money.anchor.set(0.5)
       money.scale.set(0)
-      money.position = box.getGlobalPosition()
-      money.position.x += 70
-      this.addChild(money)
+      money.position = box.position
+      money.position.x += this.slotLineContainer.position.x + 70
+      money.position.y += this.slotLineContainer.position.y + 70
+      this.gameContainer.addChild(money)
       tl.to(money, {
         stagger: {
           onComplete: () => {
@@ -371,7 +383,12 @@ export default class SlotsScene extends Container {
 
       tl.to(money, {
         x: Config.width / 2,
-        y: 80
+        y: 80,
+        stagger: {
+          onComplete: () => {
+            money.destroy()
+          }
+        }
       }, i * 0.25 + 1.8)
 
       i += 1
