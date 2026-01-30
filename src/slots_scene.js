@@ -48,12 +48,13 @@ export default class SlotsScene extends Container {
     for(let i=0; i<4; i++) {
       let slotLine = new SlotRoller({...props, startIndex: 3 - i + 5})
       slotLine.position.x = i * 175
-//      slotLine.position.y = -1172
       this.slotLines.push(slotLine)
       slotLineContainer.addChild(slotLine)
     }
 
-    this.jeffCols = this.jeffColumns()
+    let { container, list } = this.jeffColumns()
+    this.jeffColsList = list
+    this.jeffCols = container
     this.jeffCols.position.y = -840
     slotLineContainer.addChild(this.jeffCols)
 
@@ -78,10 +79,12 @@ export default class SlotsScene extends Container {
     container.addChild(this.gameContainer)
     container.addChild(gameBgContainer)
 
-    let logo = new Sprite(this.assets.logo)
-    logo.position.x = 50
-    logo.position.y = Config.height / 6 + 20
-    this.gameContainer.addChild(logo)
+    this.logo = new Sprite(this.assets.logo)
+    this.logo.anchor.set(0.5)
+    this.logo.position.x = 280
+    this.logo.position.y = Config.height / 6 + 110
+
+    this.gameContainer.addChild(this.logo)
 
     let jeff = new Sprite(this.assets.jeff)
     jeff.anchor.set(1, 1)
@@ -146,21 +149,23 @@ export default class SlotsScene extends Container {
       }, i * 0.25 + 1)
     }
 
-    let z = {value: 0}
-    tl.to(z, {
-      value: 1,
-      stagger: {
-        onComplete: () => {
-          this.jeffRoll()
-        }
-      }
-    }, 0.4)
+    for(let i=0; i<4; i++) {
+      let jeffCol = this.jeffColsList[i]
+      jeffCol.alpha = 0
 
-    setTimeout(() => {
-      this.emit("slotsStopped")
-    }, 700)
+      tl.to(jeffCol, {
+        alpha: 1,
+        y: 620,
+        duration: 1.5,
+        ease: "elastic.inOut",
+      }, i * 0.25)
+    }
 
     await tl
+//    setTimeout(() => {
+    this.emit("slotsStopped")
+//    }, 250)
+
     this.slotsRollSound.stop()
   }
 
@@ -288,9 +293,16 @@ export default class SlotsScene extends Container {
       newDrone.position.y += container.position.y + this.slotLineContainer.position.y
 
       this.gameContainer.addChild(newDrone)
-      newDrone.playAnimation()
+      tl2.to(newDrone, {
+        stagger: {
+          onComplete: () => {
+            newDrone.playAnimation()
+          }
+        }
+      }, i * 0.15)
 
       dr.destroy()
+      // полёт дронов в счётчик
       tl2.to(newDrone, {
         y: 80,
         x: Config.width / 2,
@@ -299,17 +311,17 @@ export default class SlotsScene extends Container {
             newDrone.destroy()
           }
         }
-      }, i * 0.15).delay(0.5)
+      }, i * 0.15 + 1.5).delay(0.5)
       i += 1
     })
 
     setTimeout(() => {
       this.casualWinSound.play()
-    }, 200)
+    }, 800)
 
     setTimeout(() => {
       this.emit("slotsStopped")
-    }, 1000)
+    }, 1800)
   }
 
   jeffColumns() {
@@ -322,7 +334,7 @@ export default class SlotsScene extends Container {
       container.addChild(jCol)
     }
 
-    return container
+    return {container, list: jeffColumns}
   }
 
   jeffRoll() {
@@ -414,6 +426,19 @@ export default class SlotsScene extends Container {
       duration: 1.2
     }, 0.2)
     await tl
-    console.log("spinner end")
+//    console.log("spinner end")
+  }
+
+  resize(data) {
+//    console.log("slots resize", data)
+    if (data.isPortrait) {
+      this.logo.position.x = Config.width / 2
+      this.logo.position.y = -50
+      this.logo.scale.set(0.9)
+    } else {
+      this.logo.position.x = 280
+      this.logo.scale.set(1)
+      this.logo.position.y = Config.height / 6 + 110
+    }
   }
 }

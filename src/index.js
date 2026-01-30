@@ -20,6 +20,9 @@ const initApp = async () => {
   const assets = await Assets.loadBundle("main");
 
   // --- добавляем всякое для отрисовки
+  var appData = {
+    isPortrait: false
+  }
   const game = new Game({app, assets})
   app.stage.addChild(game)
 
@@ -32,21 +35,24 @@ const initApp = async () => {
     let height = gameWrapper.offsetHeight;
 
     let screenScaleH = height / originalHeight
-//    let screenScaleW = width / originalWidth
     let screenScaleW = width / Config.minWidth
     let screenScale = screenScaleH
-
+    appData.isPortrait = false
     if (height > width) {
       screenScale = screenScaleW
+      appData.isPortrait = true
       console.log("portrait")
     } else {
       console.log("landscape")
     }
 
+    console.log("resize data", appData)
+
     app.stage.scale.set(screenScale)
     app.renderer.resize(width, height)
     app.stage.position.x = (width - Config.width * screenScale) / 2
     app.stage.position.y = (height - Config.height * screenScale) / 2
+    game.resize(appData)
   }
 
   // Масштабирование холста под размер экрана

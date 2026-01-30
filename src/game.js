@@ -29,7 +29,7 @@ export default class Game extends Container {
 //    this.state = SPINNER_STATE
 //    this.state = WIN_STATE
 
-    this.slotsScene = new SlotsScene({app: this.app, assets: this.assets})
+    this.slotsScene = new SlotsScene({app: this.app, assets: this.assets, data: this.data})
     this.addChild(this.slotsScene)
 
     let balance = 0
@@ -182,5 +182,9 @@ export default class Game extends Container {
     }).eventCallback("onComplete", () => {
       this.removeChild(this.loadingScene)
     })
+  }
+
+  resize(data) {
+    this.slotsScene.resize(data)
   }
 }
