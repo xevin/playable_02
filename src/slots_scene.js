@@ -1,4 +1,4 @@
-import { Container, Graphics, Sprite, BlurFilter, Text } from "pixi.js";
+import { Container, Graphics, Sprite, BlurFilter } from "pixi.js";
 import { gsap } from "gsap/gsap-core"
 import Config from "./config"
 import { sounds } from "./assets"
@@ -187,33 +187,31 @@ export default class SlotsScene extends Container {
   }
 
   async runSlots1() { // первый рол с ящиками
-    let idx = 0
-    let it = setInterval(() => {
-      if (idx >= 4) {
-        clearInterval(it)
-        return
-      }
+    this.boxes = this.boxColumns()
 
-      let slotLine = this.slotLines[idx]
-      slotLine.rollTo(8)
-      if (idx === 3) {
-        slotLine.on("finished", () => {
-          console.log("finished")
-        })
-      }
-      idx += 1
-    }, 250)
+    let tl = gsap.timeline()
+
+    for(let i=0; i<4; i++) {
+      tl.to(this.boxes[i], {
+        y: 325,
+      }, i * 0.25 + 1.5)
+
+      tl.to(this.slotLines[i], {
+        y: 250,
+        duration: 2,
+      }, i * 0.25)
+    }
+
+    await tl
+
+    this.boxRoll()
+    setTimeout(() => {
+      this.casualWinSound.play()
+    }, 1300)
 
     setTimeout(() => {
-      this.boxRoll()
-      setTimeout(() => {
-        console.log("slotsStopped()")
-        this.casualWinSound.play()
-        setTimeout(() => {
-          this.emit("slotsStopped")
-          this.slotsRollSound.stop()
-        }, 250)
-      }, 1800)
+      this.emit("slotsStopped")
+      this.slotsRollSound.stop()
     }, 1700)
   }
 
@@ -344,18 +342,39 @@ export default class SlotsScene extends Container {
   }
 
   async boxRoll() {
-    this.boxes = this.boxColumns()
-
     let tl = gsap.timeline()
 
-    for(let i=0; i<4; i++) {
-      tl.to(this.boxes[i], {
-        y: 325
+    let i = 0
+    let moneyList = []
+    this.boxes.forEach(box => {
+      let money = new Sprite(this.assets.dollars)
+      moneyList.push(money)
+      money.anchor.set(0.5)
+      money.scale.set(0)
+      money.position = box.getGlobalPosition()
+      money.position.x += 70
+      this.addChild(money)
+      tl.to(money, {
+        stagger: {
+          onComplete: () => {
+            box.playBoxAnimation()
+          }
+        }
       }, i * 0.25)
-    }
 
-    tl.eventCallback("onComplete", () => {
-      this.boxes.forEach(box => box.playBoxAnimation())
+      tl.to(money.scale, {
+        x: 0.8,
+        y: 0.8,
+        duration: 0.5,
+        ease: "elastic.out(0.9)"
+      }, i * 0.25 + 1.3)
+
+      tl.to(money, {
+        x: Config.width / 2,
+        y: 80
+      }, i * 0.25 + 1.8)
+
+      i += 1
     })
 
     await tl
