@@ -26,7 +26,7 @@ export default class Game extends Container {
 
     // DEBUG
 //    this.state = SLOTS_STATE
-//    this.state = SLOTS_STATE
+//    this.state = SPINNER_STATE
 //    this.state = WIN_STATE
 
     this.slotsScene = new SlotsScene({app: this.app, assets: this.assets})
@@ -176,7 +176,7 @@ export default class Game extends Container {
     await this.loader.animateLoaderProgress(100)
 
     await gsap.to(this.loadingScene, {
-      x: -this.app.screen.width - (Config.width / 2),
+      x: -this.app.screen.width - (Config.width * 2),
       duration: 1,
       ease: "power3.inOut"
     }).eventCallback("onComplete", () => {

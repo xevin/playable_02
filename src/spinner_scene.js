@@ -58,7 +58,7 @@ export default class SpinnerScene extends Container {
     this.shadowContainer.label = "shadowContainer"
     this.addChild(this.shadowContainer)
     this.shadow = new Graphics()
-    this.shadow.rect(0, 0, Config.width, Config.height).fill(0x000000)
+    this.shadow.rect(-3000, -3000, 6000, 6000).fill(0x000000)
     this.shadow.alpha = 0
     this.shadowContainer.addChild(this.shadow)
 

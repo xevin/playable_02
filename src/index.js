@@ -32,7 +32,8 @@ const initApp = async () => {
     let height = gameWrapper.offsetHeight;
 
     let screenScaleH = height / originalHeight
-    let screenScaleW = width / originalWidth
+//    let screenScaleW = width / originalWidth
+    let screenScaleW = width / Config.minWidth
     let screenScale = screenScaleH
 
     if (height > width) {

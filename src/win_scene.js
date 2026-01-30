@@ -25,7 +25,7 @@ export default class WinScene extends Container {
     })
 
     this.bg = new Graphics()
-    this.bg.rect(0, 0, Config.width, Config.height)
+    this.bg.rect(-3000, -3000, 6000, 6000)
     this.bg.fill(0x000000)
     this.bg.alpha = 0
     this.addChild(this.bg)

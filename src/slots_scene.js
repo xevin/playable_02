@@ -71,7 +71,7 @@ export default class SlotsScene extends Container {
     let gameBgContainer = new Container()
     gameBgContainer.label = "bgColor"
     this.bgColor = new Graphics()
-      .rect(0, 0, Config.width, Config.height)
+      .rect(-3000, -3000, 6000, 6000)
       .fill("#000000")
     this.bgColor.alpha = 0
     gameBgContainer.addChild(this.bgColor)
@@ -372,14 +372,14 @@ export default class SlotsScene extends Container {
             box.playBoxAnimation()
           }
         }
-      }, i * 0.25)
+      }, i * 0.15)
 
       tl.to(money.scale, {
         x: 0.8,
         y: 0.8,
         duration: 0.5,
         ease: "elastic.out(0.9)"
-      }, i * 0.25 + 1.3)
+      }, i * 0.15 + 1.3)
 
       tl.to(money, {
         x: Config.width / 2,
@@ -389,7 +389,7 @@ export default class SlotsScene extends Container {
             money.destroy()
           }
         }
-      }, i * 0.25 + 1.8)
+      }, i * 0.2 + 1.8)
 
       i += 1
     })
