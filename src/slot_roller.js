@@ -22,8 +22,6 @@ export default class SlotRoller extends Container {
   rollTo(index) {
     // прокручиваем до <index> картинки
 
-    console.log("rollTo", index, 128 * index)
-
     let tl = gsap.timeline()
     let tl_offset = 0
     this.currentIndex = index

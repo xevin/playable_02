@@ -5,6 +5,7 @@ import { sounds } from "./assets"
 import SlotRoller from "./slot_roller";
 import SlotLine from "./slot_line";
 import BoxAnimation from "./box_animation";
+import DroneAnimation from "./drone_animation";
 
 export default class SlotsScene extends Container {
   constructor(props) {
@@ -125,7 +126,8 @@ export default class SlotsScene extends Container {
   }
 
   async runSlots5() { // он же Джеф рол
-    this.resetSlotLines()
+//    this.resetSlotLines()
+    this.resetSlotLines(-3340)
 
     let tl = gsap.timeline()
 
@@ -149,10 +151,15 @@ export default class SlotsScene extends Container {
           this.jeffRoll()
         }
       }
-    }, 0.6)
+    }, 0.4)
+
+    setTimeout(() => {
+      console.log("Jeff end!")
+      this.slotsRollSound.stop()
+      this.emit("slotsStopped")
+    }, 700)
 
     await tl
-    this.emit("slotsStopped")
     this.slotsRollSound.stop()
   }
 
@@ -167,7 +174,7 @@ export default class SlotsScene extends Container {
     }
     if (this.tryCount === 2) {
       this.slotsRollSound.play()
-      this.runSlots2()
+      this.runSlots3()
     }
     if (this.tryCount === 3) {
       this.slotsRollSound.play()
@@ -188,9 +195,9 @@ export default class SlotsScene extends Container {
         clearInterval(it)
         return
       }
-      console.log("idx", idx)
+
       let slotLine = this.slotLines[idx]
-      slotLine.rollTo(8) //slotLine.startIndex)
+      slotLine.rollTo(8)
       if (idx === 3) {
         slotLine.on("finished", () => {
           console.log("finished")
@@ -233,10 +240,71 @@ export default class SlotsScene extends Container {
     this.slotsRollSound.stop()
   }
 
-  resetSlotLines() {
+  resetSlotLines(pos=-4120) {
     this.slotLines.forEach(slot => {
-      slot.position.y = -4120
+      slot.position.y = pos
     })
+  }
+
+  // ролл с дронами
+  async runSlots3() {
+    this.resetSlotLines(-3340)
+
+    let drones = []
+    let container = new Container()
+    container.position.y = -840
+    for(let i=0; i<4; i++) {
+      let drone = new DroneAnimation({assets: this.assets})
+      drone.position.x = i * 175
+      drones.push(drone)
+      container.addChild(drone)
+    }
+
+    this.slotLineContainer.addChild(container)
+
+    let tl = gsap.timeline()
+
+    for(let i=0; i<4; i++) {
+      tl.to(drones[i], {
+        y: 1250,
+        duration: 0.9,
+      }, i * 0.25 + 1.2)
+
+      tl.to(this.slotLines[i], {
+        y: 250,
+        duration: 2,
+      }, i * 0.25)
+    }
+
+    await tl
+    this.slotsRollSound.stop()
+
+    let tl2 = gsap.timeline()
+
+    let i = 0
+    drones.forEach(dr => {
+      let newDrone = new DroneAnimation({assets: this.assets})
+      newDrone.position = dr.getGlobalPosition()
+      newDrone.zIndex = 1000
+      this.addChild(newDrone)
+      newDrone.playAnimation()
+      dr.destroy()
+      tl2.to(newDrone, {
+        y: 80,
+        x: Config.width / 2,
+        stagger: {
+          onComplete: () => {
+            newDrone.destroy()
+          }
+        }
+      }, i * 0.15)
+      i += 1
+    })
+
+    setTimeout(() => {
+      this.casualWinSound.play()
+      this.emit("slotsStopped")
+    }, 300)
   }
 
   jeffColumns() {
