@@ -143,7 +143,7 @@ export default class Game extends Container {
     this.loaderBackground.filters = [new BlurFilter({strength: 30, quality: 8})]
     this.loaderBackground.anchor.set(0.5)
     let scale = this.app.screen.width / Config.width
-    this.loaderBackground.scale.set(scale + 0.3)
+    this.loaderBackground.scale.set(3)
     this.loaderBackground.position.x = Config.width / 2
     this.loaderBackground.position.y = Config.height / 2
     container.addChild(this.loaderBackground)

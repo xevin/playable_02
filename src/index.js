@@ -26,18 +26,31 @@ const initApp = async () => {
   // ---
   function resize() {
     const originalHeight = Config.height
+    const originalWidth = Config.width
 
     let width = gameWrapper.offsetWidth;
     let height = gameWrapper.offsetHeight;
 
-    let screenScale = height / originalHeight
+    let screenScaleH = height / originalHeight
+    let screenScaleW = width / originalWidth
+    let screenScale = screenScaleH
+
+    if (height > width) {
+      screenScale = screenScaleW
+      console.log("portrait")
+    } else {
+      console.log("landscape")
+    }
+
     app.stage.scale.set(screenScale)
-    app.renderer.resize(width, height);
-    app.stage.position.x = (gameWrapper.offsetWidth - Config.width * screenScale) / 2
+    app.renderer.resize(width, height)
+    app.stage.position.x = (width - Config.width * screenScale) / 2
+    app.stage.position.y = (height - Config.height * screenScale) / 2
   }
 
   // Масштабирование холста под размер экрана
   window.addEventListener("resize", resize);
+  window.addEventListener("deviceorientation", resize);
   resize()
 };
 
