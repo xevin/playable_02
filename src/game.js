@@ -1,4 +1,4 @@
-import { Container, Sprite } from "pixi.js"
+import { BlurFilter, Container, Sprite } from "pixi.js"
 import Loadbar from "./loadbar"
 import Config from "./config"
 import SlotsScene from "./slots_scene"
@@ -138,8 +138,19 @@ export default class Game extends Container {
   createLoadingScene() {
     let container = new Container()
 
+
+    this.loaderBackground = new Sprite(this.assets.loadingBackground)
+    this.loaderBackground.filters = [new BlurFilter({strength: 30, quality: 8})]
+    this.loaderBackground.anchor.set(0.5)
+    let scale = this.app.screen.width / Config.width
+    this.loaderBackground.scale.set(scale + 0.3)
+    this.loaderBackground.position.x = Config.width / 2
+    this.loaderBackground.position.y = Config.height / 2
+    container.addChild(this.loaderBackground)
+
     let bg = new Sprite(this.assets.loadingBackground)
     bg.anchor.set(0.5)
+//    bg.alpha = 0
     bg.position.x = Config.width / 2
     bg.position.y = Config.height / 2
     container.addChild(bg)
@@ -152,11 +163,11 @@ export default class Game extends Container {
       progressMask: this.assets.loaderProgressMask,
     })
     this.loader.scale.set(0.9)
-    this.loader.position.x = 1920 / 2
-    this.loader.position.y = (1080 / 10) * 9
+    this.loader.position.x = Config.width / 2
+    this.loader.position.y = (Config.height / 10) * 9
 
     container.addChild(this.loader)
-
+    this.app.renderer.background.color = Config.bgColor
     return container
   }
 
@@ -165,9 +176,9 @@ export default class Game extends Container {
     await this.loader.animateLoaderProgress(100)
 
     await gsap.to(this.loadingScene, {
-      x: -Config.width,
+      x: -this.app.screen.width - (Config.width / 2),
       duration: 1,
-      ease: "power2.inOut"
+      ease: "power3.inOut"
     }).eventCallback("onComplete", () => {
       this.removeChild(this.loadingScene)
     })
