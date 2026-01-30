@@ -22,17 +22,17 @@ export default class Game extends Container {
 
     this.app = props.app
     this.assets = props.assets
-    this.state = LOADING_STATE
+//    this.state = LOADING_STATE
 
     // DEBUG
-//    this.state = SLOTS_STATE
+    this.state = SLOTS_STATE
 //    this.state = SLOTS_STATE
 //    this.state = WIN_STATE
 
     this.slotsScene = new SlotsScene({app: this.app, assets: this.assets})
     this.addChild(this.slotsScene)
 
-    let balance = 10
+    let balance = 0
     let gotoSpinner = false
     this.gui = new Gui({...props})
     this.gui.setBalance(balance)
@@ -78,7 +78,7 @@ export default class Game extends Container {
           balance = 200
           break;
         case 2:
-          balance += 7
+          balance += 0
           break;
         case 3:
           balance = 700

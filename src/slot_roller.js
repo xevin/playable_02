@@ -1,5 +1,6 @@
-import { Container, Sprite } from "pixi.js"
+import { BlurFilter, Container, Sprite } from "pixi.js"
 import { gsap } from "gsap/gsap-core"
+import { getCyclicElement, rotateArray } from "./utils"
 
 export default class SlotRoller extends Container {
   currentIndex
@@ -12,7 +13,7 @@ export default class SlotRoller extends Container {
     this.items = []
 
     this.container = new Container()
-    this.container.label = "SlotLine"
+    this.container.label = "SlotRoller"
     this.addChild(this.container)
 
     this.drawItems()
@@ -21,15 +22,19 @@ export default class SlotRoller extends Container {
   rollTo(index) {
     // прокручиваем до <index> картинки
 
+    console.log("rollTo", index, 128 * index)
+
     let tl = gsap.timeline()
     let tl_offset = 0
+    this.currentIndex = index
     tl.to(this, {
-      y: 128 * 18,
+      y: 250,
       duration: 2,
       stagger: {
         onComplete: () => {
           this.currentIndex = index
-          this.drawItems()
+          this.emit("finished")
+//          this.drawItems()
         }
       }
     }, tl_offset)
@@ -42,50 +47,26 @@ export default class SlotRoller extends Container {
     })
 
     this.items = []
-    let itemList = this.rotateArray([1,2,3,4,5,6,7], this.currentIndex)
+    let itemList = rotateArray([1,2,3,4,5,6,7], this.currentIndex)
 
-    console.log("drawItems from", this.currentIndex, itemList)
-    for(let i=1; i<8; i++) {
-      let itemIdx = itemList[i]
+    let hOffset = 128 + 28
+    let lastYPos = 0
+//    console.log("drawItems from", this.currentIndex, itemList)
+    for(let i=0; i<32; i++) {
+//      let itemIdx = itemList[i]
+      if (i == 1) {
+        continue
+      }
+
+      let itemIdx = getCyclicElement(itemList, i)
       let slotSprite = new Sprite(this.assets["slot" + itemIdx])
       slotSprite.label = "slot" + i
-      slotSprite.position.y = i * 128
+      slotSprite.position.y = i * hOffset
+      lastYPos = i * hOffset
       this.items.push(slotSprite)
       this.container.addChild(slotSprite)
     }
 
-    for(let i=1; i<8; i++) {
-      let itemIdx = itemList[i]
-      let slotSprite = new Sprite(this.assets["slot" + itemIdx])
-      slotSprite.label = "slot" + i
-      slotSprite.position.y = i * 128 - 128 * 6
-      this.items.push(slotSprite)
-      this.container.addChild(slotSprite)
-    }
-
-    for(let i=1; i<8; i++) {
-      let itemIdx = itemList[i]
-      let slotSprite = new Sprite(this.assets["slot" + itemIdx])
-      slotSprite.label = "slot" + i
-      slotSprite.position.y = i * 128 - 128 * 6 - 128 * 6
-      this.items.push(slotSprite)
-      this.container.addChild(slotSprite)
-    }
-
-    for(let i=1; i<8; i++) {
-      let itemIdx = itemList[i]
-      let slotSprite = new Sprite(this.assets["slot" + itemIdx])
-      slotSprite.label = "slot" + i
-      slotSprite.position.y = i * 128 - 128 * 6 - 128 * 6 - 128 * 6
-      this.items.push(slotSprite)
-      this.container.addChild(slotSprite)
-    }
-  }
-
-  rotateArray(arr, startIndex) {
-    if (!Array.isArray(arr) || arr.length === 0) return [];
-
-    const index = ((startIndex % arr.length) + arr.length) % arr.length;
-    return [...arr.slice(index), ...arr.slice(0, index)];
+    this.position.y = -lastYPos + hOffset * 4.5
   }
 }

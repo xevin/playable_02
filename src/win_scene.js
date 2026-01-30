@@ -38,7 +38,7 @@ export default class WinScene extends Container {
     // лучи
     this.lights = new Sprite(this.assets.lights)
     this.lights.anchor.set(0.5)
-    this.lights.scale.set(0.5)
+    this.lights.scale.set(2)
     this.lights.alpha = 0.7
     this.lights.position.y = -100
     this.lights.filters = [new BlurFilter({strength: 30, quality: 7})]
