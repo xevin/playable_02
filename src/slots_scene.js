@@ -162,6 +162,12 @@ export default class SlotsScene extends Container {
     }
 
     await tl
+    for (let i=0; i<4; i++) {
+      let slot = this.jeffColsList[i]
+      slot.runJeffZoom()
+    }
+
+    await tl
 //    setTimeout(() => {
     this.emit("slotsStopped")
 //    }, 250)

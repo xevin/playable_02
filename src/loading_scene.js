@@ -16,6 +16,7 @@ export default class LoadingScene extends Container {
     this.loaderBackground = new Sprite(this.assets.loadingBackground)
     this.loaderBackground.anchor.set(0.5)
     this.loaderBackground.addChild(this.loaderBackground)
+    this.loaderBackground.eventMode = "static"
     this.bgContainer.addChild(this.loaderBackground)
 
     // LOADER
