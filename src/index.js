@@ -2,7 +2,7 @@ import { Application, Assets, Sprite } from "pixi.js";
 // import AssetLib from "./assets.js"
 import Game from "./game";
 import Config from "./config"
-import { initDevtools } from "@pixi/devtools";
+// import { initDevtools } from "@pixi/devtools";
 import LoadingScene from "./loading_scene";
 
 const initApp = async () => {
@@ -15,7 +15,7 @@ const initApp = async () => {
   });
   gameWrapper.appendChild(app.canvas)
 
-  initDevtools({app})
+  // initDevtools({app})
 
   // --- Ассеты
   const assets = await Assets.loadBundle("main");

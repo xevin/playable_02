@@ -116,7 +116,7 @@ export default class Game extends Container {
     this.winScene = new WinScene({...props})
     this.addChild(this.winScene)
 
-    this.slotsScene.visible = this.state === SLOTS_STATE || this.state === LOADING_STATE
+    this.slotsScene.visible = this.state === SLOTS_STATE
     this.spinnerScene.visible = this.state === SPINNER_STATE
     this.winScene.visible = this.state === WIN_STATE
 

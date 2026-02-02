@@ -1,4 +1,5 @@
-import { AlphaFilter, BlurFilter, Container, FillGradient, Graphics, Sprite, Text } from "pixi.js"
+import { BlurFilter, Container, Graphics, Sprite, Text } from "pixi.js"
+import CoinsDrop from "./coins_drop_animation";
 import Config from "./config"
 import { gsap } from "gsap/gsap-core"
 import { sounds } from "./assets"
@@ -30,6 +31,13 @@ export default class WinScene extends Container {
     this.bg.fill(0x000000)
     this.bg.alpha = 0
     this.addChild(this.bg)
+
+    this.coins = new CoinsDrop({app: this.app, assets: this.assets})
+    this.coins.position.x = Config.width / 2
+    this.coins.position.y = Config.height / 2 - 300
+    this.coins.play()
+    this.coins.scale.set(2.4)
+    this.addChild(this.coins)
 
     this.container = new Container()
     this.container.position.x = Config.width / 2
@@ -82,7 +90,8 @@ export default class WinScene extends Container {
     this.installButton.on("pointerdown", () => {
       console.log("Playable переход куда надо")
       this.clickSound.play()
-      triggerSDKDownload()
+      window.fbPlayableAd.onCTAClick()
+      // triggerSDKDownload()
     })
     this.container.addChild(this.installButton)
   }
@@ -227,5 +236,7 @@ export default class WinScene extends Container {
       duration: 0.3,
       ease: "power1.inOut",
     }, installButtonStart)
+
+    this.coins.play()
   }
 }
