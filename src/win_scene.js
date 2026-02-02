@@ -90,7 +90,7 @@ export default class WinScene extends Container {
     this.installButton.on("pointerdown", () => {
       console.log("Playable переход куда надо")
       this.clickSound.play()
-      window.fbPlayableAd.onCTAClick()
+      window.FbPlayableAd.onCTAClick()
       // triggerSDKDownload()
     })
     this.container.addChild(this.installButton)

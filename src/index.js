@@ -1,9 +1,21 @@
-import { Application, Assets, Sprite } from "pixi.js";
+import { Application } from "pixi.js";
 // import AssetLib from "./assets.js"
 import Game from "./game";
 import Config from "./config"
 // import { initDevtools } from "@pixi/devtools";
 import LoadingScene from "./loading_scene";
+import { images, fontData } from "./assets"
+import { loadTextureFromBase64, loadCustomFont } from "./utils";
+
+let assetsLoad = async () => {
+  let _images = {...images}
+
+  for(let key in images) {
+    _images[key] = await loadTextureFromBase64(images[key])
+  }
+
+  return _images
+}
 
 const initApp = async () => {
   const app = new Application();
@@ -18,18 +30,23 @@ const initApp = async () => {
   // initDevtools({app})
 
   // --- Ассеты
-  const assets = await Assets.loadBundle("main");
+  // const assets = await Assets.loadBundle("main");
+  const assets = await assetsLoad()
+  const font = await loadCustomFont(fontData.src)
 
   // --- добавляем всякое для отрисовки
-  var appData = {
+  let appData = {
     isPortrait: false
   }
+
   const game = new Game({app, assets})
   app.stage.addChild(game)
 
   const loader = new LoadingScene({app, assets})
   app.stage.addChild(loader)
-  loader.animateLoader()
+  setTimeout(() => {
+    loader.animateLoader()
+  }, 300)
 
   // ---
   function resize() {

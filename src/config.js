@@ -7,7 +7,7 @@ export default {
   fontStyles: {
     fill: "#3d3d3d",
     fontSize: 60,
-    fontFamily: "Shripht",
+    fontFamily: "CustomFont",
     align: "center"
   }
 }
