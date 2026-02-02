@@ -7,7 +7,6 @@ import { gsap } from "gsap/gsap-core"
 import WinScene from "./win_scene"
 import SpinnerScene from "./spinner_scene"
 
-const LOADING_STATE = 1
 const SLOTS_STATE = 2
 const SPINNER_STATE = 3
 const WIN_STATE = 4
@@ -22,10 +21,9 @@ export default class Game extends Container {
 
     this.app = props.app
     this.assets = props.assets
-    this.state = LOADING_STATE
 
     // DEBUG
-//    this.state = SLOTS_STATE
+   this.state = SLOTS_STATE
 //    this.state = SPINNER_STATE
 //    this.state = WIN_STATE
 
@@ -99,8 +97,6 @@ export default class Game extends Container {
       console.log("clicks now", clickCount)
     })
 
-    this.loadingScene = this.createLoadingScene()
-
     this.spinnerScene = new SpinnerScene({...props})
     this.spinnerScene.on("spinnerDone", () => {
       balance = balance * 66
@@ -117,13 +113,9 @@ export default class Game extends Container {
     this.addChild(this.spinnerScene)
     this.addChild(this.gui)
 
-    this.addChild(this.loadingScene)
-    this.startLoading()
-
     this.winScene = new WinScene({...props})
     this.addChild(this.winScene)
 
-    this.loadingScene.visible = this.state === LOADING_STATE
     this.slotsScene.visible = this.state === SLOTS_STATE || this.state === LOADING_STATE
     this.spinnerScene.visible = this.state === SPINNER_STATE
     this.winScene.visible = this.state === WIN_STATE
@@ -135,56 +127,10 @@ export default class Game extends Container {
     }
   }
 
-  createLoadingScene() {
-    let container = new Container()
-
-
-    this.loaderBackground = new Sprite(this.assets.loadingBackground)
-    this.loaderBackground.filters = [new BlurFilter({strength: 30, quality: 8})]
-    this.loaderBackground.anchor.set(0.5)
-    let scale = this.app.screen.width / Config.width
-    this.loaderBackground.scale.set(3)
-    this.loaderBackground.position.x = Config.width / 2
-    this.loaderBackground.position.y = Config.height / 2
-    container.addChild(this.loaderBackground)
-
-    let bg = new Sprite(this.assets.loadingBackground)
-    bg.anchor.set(0.5)
-//    bg.alpha = 0
-    bg.position.x = Config.width / 2
-    bg.position.y = Config.height / 2
-    container.addChild(bg)
-
-    // LOADER
-    this.loader = new Loadbar({
-      bg: this.assets.loaderBg,
-      fg: this.assets.loaderFg,
-      progress: this.assets.loaderProgress,
-      progressMask: this.assets.loaderProgressMask,
-    })
-    this.loader.scale.set(0.9)
-    this.loader.position.x = Config.width / 2
-    this.loader.position.y = (Config.height / 10) * 9
-
-    container.addChild(this.loader)
-    this.app.renderer.background.color = Config.bgColor
-    return container
-  }
-
-  async startLoading() {
-    await this.loader.animateLoaderProgress(30)
-    await this.loader.animateLoaderProgress(100)
-
-    await gsap.to(this.loadingScene, {
-      x: -this.app.screen.width - (Config.width * 2),
-      duration: 1,
-      ease: "power3.inOut"
-    }).eventCallback("onComplete", () => {
-      this.removeChild(this.loadingScene)
-    })
-  }
-
   resize(data) {
+    this.scale.set(data.scale)
+    this.position.x = (data.width - Config.width * data.scale) / 2
+    this.position.y = (data.height - Config.height * data.scale) / 2
     this.slotsScene.resize(data)
   }
 }

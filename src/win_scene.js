@@ -2,6 +2,7 @@ import { AlphaFilter, BlurFilter, Container, FillGradient, Graphics, Sprite, Tex
 import Config from "./config"
 import { gsap } from "gsap/gsap-core"
 import { sounds } from "./assets"
+import { triggerSDKDownload } from "./utils"
 
 export default class WinScene extends Container {
   balanceValue = 700
@@ -81,6 +82,7 @@ export default class WinScene extends Container {
     this.installButton.on("pointerdown", () => {
       console.log("Playable переход куда надо")
       this.clickSound.play()
+      triggerSDKDownload()
     })
     this.container.addChild(this.installButton)
   }

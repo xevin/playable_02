@@ -1,8 +1,9 @@
-import { Application, Assets } from "pixi.js";
-import AssetLib from "./assets.js"
+import { Application, Assets, Sprite } from "pixi.js";
+// import AssetLib from "./assets.js"
 import Game from "./game";
 import Config from "./config"
 import { initDevtools } from "@pixi/devtools";
+import LoadingScene from "./loading_scene";
 
 const initApp = async () => {
   const app = new Application();
@@ -26,17 +27,19 @@ const initApp = async () => {
   const game = new Game({app, assets})
   app.stage.addChild(game)
 
+  const loader = new LoadingScene({app, assets})
+  app.stage.addChild(loader)
+  loader.animateLoader()
+
   // ---
   function resize() {
-    const originalHeight = Config.height
-    const originalWidth = Config.width
+    let width = gameWrapper.offsetWidth
+    let height = gameWrapper.offsetHeight
 
-    let width = gameWrapper.offsetWidth;
-    let height = gameWrapper.offsetHeight;
-
-    let screenScaleH = height / originalHeight
+    let screenScaleH = height / Config.height
     let screenScaleW = width / Config.minWidth
     let screenScale = screenScaleH
+
     appData.isPortrait = false
     if (height > width) {
       screenScale = screenScaleW
@@ -46,13 +49,31 @@ const initApp = async () => {
       console.log("landscape")
     }
 
-    console.log("resize data", appData)
+    appData.scale = screenScale
+    appData.width = width
+    appData.height = height
 
-    app.stage.scale.set(screenScale)
     app.renderer.resize(width, height)
-    app.stage.position.x = (width - Config.width * screenScale) / 2
-    app.stage.position.y = (height - Config.height * screenScale) / 2
+
+    // вместо скейла stage, скейлим game
+    // app.stage.scale.set(screenScale)
+    // вместо этого, центрируется game
+    // app.stage.position.x = (width - Config.width * screenScale) / 2
+    // app.stage.position.y = (height - Config.height * screenScale) / 2
     game.resize(appData)
+
+    // LoadScene масштабирование
+    const scaleX = app.screen.width / Config.width
+    const scaleY = app.screen.height / Config.height
+
+    loader.resize({
+      // Берем больший масштаб
+      scale: Math.max(scaleY, scaleX),
+      isPortrait: appData.isPortrait,
+      x: width / 2,
+      y: height / 2,
+      screenScale: screenScale,
+    })
   }
 
   // Масштабирование холста под размер экрана
